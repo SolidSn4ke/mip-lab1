@@ -1,0 +1,19 @@
+cradle:
+  multi:
+    - path: "./src"
+      config:
+        cradle:
+          cabal:
+            component: "lib:lab1"
+    
+    - path: "./app"
+      config:
+        cradle:
+          cabal:
+            component: "exe:lab1-exe"
+    
+    - path: "./test"
+      config:
+        cradle:
+          cabal:
+            component: "test:lab1-test"
