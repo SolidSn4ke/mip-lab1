@@ -2,6 +2,7 @@ module Lib (
     colorIntensity,
 ) where
 
+import Data.Function ((&))
 import Intensity
 import RGB
 
@@ -11,4 +12,4 @@ colorIntensity (Intensity rgb) angle = Intensity $ RGB (r * cosT) (g * cosT) (b 
     r = getR rgb
     g = getG rgb
     b = getB rgb
-    cosT = cos angle
+    cosT = cos angle & max 0

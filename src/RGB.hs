@@ -1,6 +1,6 @@
 module RGB (RGB (..), getR, getG, getB) where
 
-data RGB = RGB Double Double Double
+data RGB = RGB Double Double Double deriving (Eq)
 
 getR :: RGB -> Double
 getR (RGB r _ _) = r
