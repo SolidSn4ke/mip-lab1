@@ -1,5 +1,6 @@
+import Illuminance (Illuminance (Illuminance))
 import Intensity (Intensity (Intensity))
-import Lib (colorIntensity)
+import Lib (colorIlluminance, colorIntensity)
 import RGB (RGB (RGB))
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.HUnit (testCase, (@?), (@?=))
@@ -9,7 +10,7 @@ main :: IO ()
 main = defaultMain unitTests
 
 unitTests :: TestTree
-unitTests = testGroup "Module Tests" [colorIntensityTests]
+unitTests = testGroup "Module Tests" [colorIntensityTests, colorIlluminanceTests]
 
 eps :: Double
 eps = (10 :: Double) ** (-15)
@@ -32,4 +33,23 @@ colorIntensityTests =
                 all (\x -> abs x < eps) [r, g, b] @? printf "expected (0, 0, 0), but got (%f, %f, %f)" r g b,
           testCase "45 degree angle source" $ colorIntensity (Intensity (RGB 1 0 0)) (pi / 4) @?= Intensity (RGB (sqrt 2 / 2) 0 0),
           testCase "89 degree angle source" $ colorIntensity (Intensity (RGB 1 1 1)) (pi / 180 * 89) @?= Intensity (RGB 1.74524064372836e-2 1.74524064372836e-2 1.74524064372836e-2)
+        ]
+
+colorIlluminanceTests :: TestTree
+colorIlluminanceTests =
+    testGroup
+        "Color Illuinance"
+        [ testCase "Direct light source" $ colorIlluminance (Intensity (RGB 1 1 1)) 0 0 1 @?= Illuminance (RGB 1 1 1),
+          testCase "Direct light source, only red" $ colorIlluminance (Intensity (RGB 1 0 0)) 0 0 1 @?= Illuminance (RGB 1 0 0),
+          testCase "Direct light source, big dist" $ colorIlluminance (Intensity (RGB 1 1 1)) 0 0 10 @?= Illuminance (RGB 0.01 0.01 0.01),
+          testCase "60 degrees alpha angle" $
+            let
+                Illuminance (RGB r g b) = colorIlluminance (Intensity (RGB 1 1 1)) 0 (pi / 3) 1
+             in
+                all (\x -> abs x < eps) [r - 0.5, g - 0.5, b - 0.5] @? printf "Expected (0.5, 0.5, 0.5), but got: (%f, %f, %f)" r g b,
+          testCase "90 degrees alpha angle" $
+            let
+                Illuminance (RGB r g b) = colorIlluminance (Intensity (RGB 1 1 1)) 0 (pi / 2) 1
+             in
+                all (\x -> abs x < eps) [r, g, b] @? printf "Expected (0, 0, 0), but got: (%f, %f, %f)" r g b
         ]
