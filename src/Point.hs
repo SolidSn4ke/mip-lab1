@@ -1,4 +1,4 @@
-module Point (Point (..), mul, norm, normalize) where
+module Point (Point (..), mul, norm, normalize, dot) where
 
 import Data.Function ((&))
 
@@ -24,6 +24,9 @@ instance Num Point where
 
 mul :: Point -> Double -> Point
 mul (Point x y z) a = Point (x * a) (y * a) (z * a)
+
+dot :: Point -> Point -> Double
+dot (Point x1 y1 z1) (Point x2 y2 z2) = x1 * x2 + y1 * y2 + z1 * z2
 
 norm :: Point -> Double
 norm (Point x y z) = sqrt $ x ** 2 + y ** 2 + z ** 2

@@ -5,27 +5,27 @@ module Lib (
     normalVec,
 ) where
 
-import Data.Function ((&))
 import Illuminance (Illuminance (..))
 import Intensity
-import Point (Point (..), mul, normalize)
+import LightSource (LightSource (..))
+import Point (Point (..), dot, mul, norm, normalize)
 import RGB
 
-colorIntensity :: Intensity -> Double -> Intensity
-colorIntensity (Intensity rgb) angle = Intensity $ RGB (r * cosT) (g * cosT) (b * cosT)
+colorIntensity :: LightSource -> Point -> Intensity
+colorIntensity (LightSource i0 pL axis) pT = Intensity $ RGB (r * cosT) (g * cosT) (b * cosT)
   where
-    r = getR rgb
-    g = getG rgb
-    b = getB rgb
-    cosT = cos angle & max 0
+    Intensity (RGB r g b) = i0
+    s = pT - pL
+    cosT = s `dot` axis / norm s
 
-colorIlluminance :: Intensity -> Double -> Double -> Double -> Illuminance
-colorIlluminance i0 theta alpha dist = Illuminance $ RGB r' g' b'
+colorIlluminance :: LightSource -> Point -> Point -> Illuminance
+colorIlluminance ls pT n = Illuminance $ RGB (r * cosA / rSqr) (g * cosA / rSqr) (b * cosA / rSqr)
   where
-    Intensity (RGB r g b) = colorIntensity i0 theta
-    r' = r * cos alpha / dist ** 2
-    g' = g * cos alpha / dist ** 2
-    b' = b * cos alpha / dist ** 2
+    LightSource _ pL _ = ls
+    Intensity (RGB r g b) = colorIntensity ls pT
+    s = pT - pL
+    cosA = s `dot` n / norm s
+    rSqr = norm s ** 2
 
 localToGlobal :: Double -> Double -> Point -> Point -> Point -> Point
 localToGlobal x y p0 p1 p2 = p0 + (normalize (p1 - p0) `mul` x + normalize (p2 - p0) `mul` y)

@@ -28,6 +28,7 @@ library
       Illuminance
       Intensity
       Lib
+      LightSource
       Point
       RGB
   other-modules:
