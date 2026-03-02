@@ -1,6 +1,7 @@
 import Illuminance (Illuminance (Illuminance))
 import Intensity (Intensity (Intensity))
-import Lib (colorIlluminance, colorIntensity)
+import Lib (colorIlluminance, colorIntensity, localToGlobal)
+import Point (Point (..))
 import RGB (RGB (RGB))
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.HUnit (testCase, (@?), (@?=))
@@ -10,7 +11,7 @@ main :: IO ()
 main = defaultMain unitTests
 
 unitTests :: TestTree
-unitTests = testGroup "Module Tests" [colorIntensityTests, colorIlluminanceTests]
+unitTests = testGroup "Module Tests" [colorIntensityTests, colorIlluminanceTests, localToGlobalTest]
 
 eps :: Double
 eps = (10 :: Double) ** (-15)
@@ -52,4 +53,14 @@ colorIlluminanceTests =
                 Illuminance (RGB r g b) = colorIlluminance (Intensity (RGB 1 1 1)) 0 (pi / 2) 1
              in
                 all (\x -> abs x < eps) [r, g, b] @? printf "Expected (0, 0, 0), but got: (%f, %f, %f)" r g b
+        ]
+
+localToGlobalTest :: TestTree
+localToGlobalTest =
+    testGroup
+        "Local To Global"
+        [ testCase "Starting point" $ localToGlobal 0 0 (Point 0 0 0) (Point 2 0 0) (Point 0 3 0) @?= Point 0 0 0,
+          testCase "On the edge" $ localToGlobal 2 0 (Point 1 1 1) (Point 4 1 1) (Point 1 5 1) @?= Point 3 1 1,
+          testCase "Inside triangle" $ localToGlobal 1.5 0.5 (Point 0 0 0) (Point 2 0 0) (Point 0 2 0) @?= Point 1.5 0.5 0,
+          testCase "Normalize check" $ localToGlobal 2 3 (Point 0 0 0) (Point 0 5 0) (Point 0 0 10) @?= Point 0 2 3
         ]

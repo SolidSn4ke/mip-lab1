@@ -1,5 +1,3 @@
-module Main (main) where
-
 import Intensity ()
 import Lib ()
 import RGB ()

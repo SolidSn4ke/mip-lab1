@@ -28,6 +28,7 @@ library
       Illuminance
       Intensity
       Lib
+      Point
       RGB
   other-modules:
       Paths_lab1
