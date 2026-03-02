@@ -2,6 +2,7 @@ module Lib (
     colorIntensity,
     colorIlluminance,
     localToGlobal,
+    normalVec,
 ) where
 
 import Data.Function ((&))
@@ -28,3 +29,6 @@ colorIlluminance i0 theta alpha dist = Illuminance $ RGB r' g' b'
 
 localToGlobal :: Double -> Double -> Point -> Point -> Point -> Point
 localToGlobal x y p0 p1 p2 = p0 + (normalize (p1 - p0) `mul` x + normalize (p2 - p0) `mul` y)
+
+normalVec :: Point -> Point -> Point -> Point
+normalVec p0 p1 p2 = normalize $ (p2 - p0) * (p1 - p0)

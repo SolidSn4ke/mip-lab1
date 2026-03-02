@@ -1,6 +1,6 @@
 import Illuminance (Illuminance (Illuminance))
 import Intensity (Intensity (Intensity))
-import Lib (colorIlluminance, colorIntensity, localToGlobal)
+import Lib
 import Point (Point (..))
 import RGB (RGB (RGB))
 import Test.Tasty (TestTree, defaultMain, testGroup)
@@ -11,7 +11,7 @@ main :: IO ()
 main = defaultMain unitTests
 
 unitTests :: TestTree
-unitTests = testGroup "Module Tests" [colorIntensityTests, colorIlluminanceTests, localToGlobalTest]
+unitTests = testGroup "Module Tests" [colorIntensityTests, colorIlluminanceTests, localToGlobalTest, normalVecTest]
 
 eps :: Double
 eps = (10 :: Double) ** (-15)
@@ -63,4 +63,17 @@ localToGlobalTest =
           testCase "On the edge" $ localToGlobal 2 0 (Point 1 1 1) (Point 4 1 1) (Point 1 5 1) @?= Point 3 1 1,
           testCase "Inside triangle" $ localToGlobal 1.5 0.5 (Point 0 0 0) (Point 2 0 0) (Point 0 2 0) @?= Point 1.5 0.5 0,
           testCase "Normalize check" $ localToGlobal 2 3 (Point 0 0 0) (Point 0 5 0) (Point 0 0 10) @?= Point 0 2 3
+        ]
+
+normalVecTest :: TestTree
+normalVecTest =
+    testGroup
+        "Normal Vector"
+        [ testCase "Triangle in XY plane (order 1)" $ normalVec (Point 0 0 0) (Point 1 0 0) (Point 0 1 0) @?= Point 0 0 (-1),
+          testCase "Triangle in XY plane (order 2)" $ normalVec (Point 0 0 0) (Point 0 1 0) (Point 1 0 0) @?= Point 0 0 1,
+          testCase "Triangle in XZ plane" $ normalVec (Point 0 0 0) (Point 1 0 0) (Point 0 0 1) @?= Point 0 1 0,
+          testCase "Triangle in YZ plane" $ normalVec (Point 0 0 0) (Point 0 1 0) (Point 0 0 1) @?= Point (-1) 0 0,
+          testCase "Normalize check (scaled triangle)" $ normalVec (Point 0 0 0) (Point 2 0 0) (Point 0 3 0) @?= Point 0 0 (-1),
+          testCase "Offset triangle (parallel to XY)" $ normalVec (Point 1 1 1) (Point 4 1 1) (Point 1 5 1) @?= Point 0 0 (-1),
+          testCase "" $ normalVec (Point 1 1 1) (Point 4 1 1) (Point 1 5 1) @?= Point 0 0 (-1)
         ]

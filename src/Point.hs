@@ -12,7 +12,7 @@ instance Num Point where
 
     (-) p1 p2 = p1 + negate p2
 
-    (*) (Point x1 y1 z1) (Point x2 y2 z2) = Point (y1 * z2 - z1 * y2) (x1 * z2 - z1 * x2) (x1 * y2 - y1 * x2)
+    (*) (Point x1 y1 z1) (Point x2 y2 z2) = Point (y1 * z2 - z1 * y2) (z1 * x2 - x1 * z2) (x1 * y2 - y1 * x2)
 
     negate (Point x y z) = Point (negate x) (negate y) (negate z)
 
