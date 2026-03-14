@@ -1,12 +1,12 @@
-module RGB (RGB (..), getR, getG, getB) where
+module RGB (RGB (..), add, mul, mulVal) where
 
 data RGB = RGB Double Double Double deriving (Eq)
 
-getR :: RGB -> Double
-getR (RGB r _ _) = r
+add :: RGB -> RGB -> RGB
+add (RGB r1 g1 b1) (RGB r2 g2 b2) = RGB (r1 + r2) (g1 + g2) (b1 + b2)
 
-getG :: RGB -> Double
-getG (RGB _ g _) = g
+mul :: RGB -> RGB -> RGB
+mul (RGB r1 g1 b1) (RGB r2 g2 b2) = RGB (r1 * r2) (g1 * g2) (b1 * b2)
 
-getB :: RGB -> Double
-getB (RGB _ _ b) = b
+mulVal :: RGB -> Double -> RGB
+mulVal (RGB r g b) value = RGB (r * value) (g * value) (b * value)
