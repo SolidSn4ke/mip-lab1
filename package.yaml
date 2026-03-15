@@ -21,6 +21,7 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- aeson
 
 ghc-options:
 - -Wall
@@ -46,6 +47,8 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - lab1
+    - bytestring
+    - text
 
 tests:
   lab1-test:
