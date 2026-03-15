@@ -1,11 +1,4 @@
 module Lib (
-    colorIntensity,
-    colorIlluminance,
-    localToGlobal,
-    normalVec,
-    middleVec,
-    brdf,
-    colorBrightness,
     calcBrightness,
     calcIlluminance,
 ) where
@@ -26,7 +19,7 @@ colorIntensity (LightSource i0' pL axis) pT = Intensity $ mulVal rgb' cosT
     cosT = normalize s `dot` normalize axis
 
 colorIlluminance :: LightSource -> Point -> Point -> Illuminance
-colorIlluminance ls pT n = Illuminance $ mulVal rgb' $ cosA / rSqr
+colorIlluminance ls pT n = if z pL <= 0 then Illuminance $ RGB 0 0 0 else Illuminance $ mulVal rgb' $ cosA / rSqr
   where
     LightSource _ pL _ = ls
     Intensity rgb' = colorIntensity ls pT
@@ -61,7 +54,7 @@ colorBrightness ls pT n v kRGB kD kS kE = Brightness $ foldl helper (RGB 0 0 0) 
             rgb' `add` (eRgb `RGB.mul` brdf kRGB n v s kD kS kE)
 
 calcBrightness :: [LightSource] -> Triangle -> Point -> Surface -> (Double, Double) -> Brightness
-calcBrightness ls t vP s (x', y') = colorBrightness ls pT n v kRGB kD kS kE
+calcBrightness ls t vP s (x', y') = if z vP <= 0 then Brightness $ RGB 0 0 0 else colorBrightness ls pT n v kRGB kD kS kE
   where
     Triangle p_0 p_1 p_2 = t
     Surface kRGB kD kS kE = s
