@@ -1,7 +1,10 @@
+import Brightness
 import Data.Aeson
 import qualified Data.ByteString.Lazy as BL
+import Illuminance
 import Intensity ()
 import Lib (calcBrightness, calcIlluminance)
+import RGB
 import Scene
 import Text.Printf (printf)
 
@@ -22,11 +25,33 @@ mainLoop = do
                 do
                     mapM_
                         ( \(l, i) -> do
-                            putStrLn $ printf "Illuminance E_%d:" i
-                            mapM_ (\(x, y) -> print $ calcIlluminance l t (x, y)) ps
+                            putStrLn $ printf "\nIlluminance E_%d:" i
+                            putStr $ printf "|  Y/X  "
+                            mapM_ ((putStr . printf "| %21.3f ") . fst) ps
+                            putStrLn ""
+                            mapM_
+                                ( ( \y -> do
+                                        putStr $ printf "| %4.3f " y
+                                        mapM_ ((\x -> let Illuminance (RGB r' g' b') = calcIlluminance l t (x, y) in putStr $ printf "| (%5.2f, %5.2f, %5.2f) " r' g' b') . fst) ps
+                                        putStrLn ""
+                                  )
+                                    . snd
+                                )
+                                ps
                         )
                         $ zip ls [1 .. length ls]
 
-                    putStrLn "Brightness:"
-                    mapM_ (\(x, y) -> print $ calcBrightness ls t v s (x, y)) ps
+                    putStrLn "\nBrightness:"
+                    putStr $ printf "|  Y/X  "
+                    mapM_ ((putStr . printf "| %21.3f ") . fst) ps
+                    putStrLn ""
+                    mapM_
+                        ( ( \y -> do
+                                putStr $ printf "| %4.3f " y
+                                mapM_ ((\x -> let Brightness (RGB r' g' b') = calcBrightness ls t v s (x, y) in putStr $ printf "| (%5.2f, %5.2f, %5.2f) " r' g' b') . fst) ps
+                                putStrLn ""
+                          )
+                            . snd
+                        )
+                        ps
     mainLoop
