@@ -9,8 +9,8 @@ import Point (Point)
 
 data LightSource = LightSource
     { i0 :: Intensity,
-      o :: Point,
-      p :: Point
+      p :: Point,
+      o :: Point
     }
     deriving (Show, Generic)
 

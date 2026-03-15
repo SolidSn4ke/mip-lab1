@@ -5,8 +5,9 @@ module Lib (
     normalVec,
     middleVec,
     brdf,
+    colorBrightness,
     calcBrightness,
-    calc,
+    calcIlluminance,
 ) where
 
 import Brightness
@@ -22,7 +23,7 @@ colorIntensity (LightSource i0' pL axis) pT = Intensity $ mulVal rgb' cosT
   where
     Intensity rgb' = i0'
     s = pT - pL
-    cosT = s `dot` axis / norm s
+    cosT = normalize s `dot` normalize axis
 
 colorIlluminance :: LightSource -> Point -> Point -> Illuminance
 colorIlluminance ls pT n = Illuminance $ mulVal rgb' $ cosA / rSqr
@@ -30,7 +31,7 @@ colorIlluminance ls pT n = Illuminance $ mulVal rgb' $ cosA / rSqr
     LightSource _ pL _ = ls
     Intensity rgb' = colorIntensity ls pT
     s = pL - pT
-    cosA = s `dot` n / norm s
+    cosA = normalize s `dot` normalize n
     rSqr = norm s ** 2
 
 localToGlobal :: Double -> Double -> Point -> Point -> Point -> Point
@@ -48,8 +49,8 @@ brdf rgb' n v s kD kS kE = mulVal rgb' k'
     h = middleVec v s
     k' = kD + kS * (h `dot` n) ** kE
 
-calcBrightness :: [LightSource] -> Point -> Point -> Point -> RGB -> Double -> Double -> Double -> Brightness
-calcBrightness ls pT n v kRGB kD kS kE = Brightness $ foldl helper (RGB 0 0 0) ls `mulVal` (1 / pi)
+colorBrightness :: [LightSource] -> Point -> Point -> Point -> RGB -> Double -> Double -> Double -> Brightness
+colorBrightness ls pT n v kRGB kD kS kE = Brightness $ foldl helper (RGB 0 0 0) ls `mulVal` (1 / pi)
   where
     helper rgb' ls' =
         let
@@ -59,10 +60,18 @@ calcBrightness ls pT n v kRGB kD kS kE = Brightness $ foldl helper (RGB 0 0 0) l
          in
             rgb' `add` (eRgb `RGB.mul` brdf kRGB n v s kD kS kE)
 
-calc :: [LightSource] -> Triangle -> Point -> Surface -> (Double, Double) -> Brightness
-calc ls t v s (x', y') = calcBrightness ls pT n v kRGB kD kS kE
+calcBrightness :: [LightSource] -> Triangle -> Point -> Surface -> (Double, Double) -> Brightness
+calcBrightness ls t vP s (x', y') = colorBrightness ls pT n v kRGB kD kS kE
   where
     Triangle p_0 p_1 p_2 = t
     Surface kRGB kD kS kE = s
+    v = pT - vP
+    pT = localToGlobal x' y' p_0 p_1 p_2
+    n = normalVec p_0 p_1 p_2
+
+calcIlluminance :: LightSource -> Triangle -> (Double, Double) -> Illuminance
+calcIlluminance ls t (x', y') = colorIlluminance ls pT n
+  where
+    Triangle p_0 p_1 p_2 = t
     pT = localToGlobal x' y' p_0 p_1 p_2
     n = normalVec p_0 p_1 p_2
